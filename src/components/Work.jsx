@@ -1,153 +1,131 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { MessageCircle, ExternalLink } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { ExternalLink, Filter, Play, MessageCircle } from 'lucide-react';
 
-function ProjectCard({ mood, title, description, tags, href }) {
+function Tag({ children }) {
+  return (
+    <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs text-zinc-200">
+      {children}
+    </span>
+  );
+}
+
+function ProjectCard({ mood, title, summary, stack, labels = [], media, link }) {
   const isAI = mood === 'ai';
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className={`group block rounded-2xl border p-5 transition-transform hover:-translate-y-0.5 ${
-        isAI
-          ? 'border-white/10 bg-white/5 hover:bg-white/10'
-          : 'border-zinc-800 bg-zinc-900/70 hover:bg-zinc-900'
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="text-white font-semibold">{title}</h3>
-        <ExternalLink size={16} className="text-zinc-400 group-hover:text-white" />
+    <div className={`group relative overflow-hidden rounded-2xl border p-4 transition ${
+      isAI ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-zinc-800 bg-zinc-900/70 hover:bg-zinc-900'
+    }`}>
+      <div className="aspect-video rounded-xl bg-black/40 grid place-items-center overflow-hidden">
+        {media ? (
+          <video className="h-full w-full object-cover" src={media} autoPlay loop muted playsInline />
+        ) : (
+          <Play className="h-6 w-6 text-zinc-400" />
+        )}
       </div>
-      <p className={`mt-2 text-sm ${isAI ? 'text-zinc-200' : 'text-zinc-300'}`}>{description}</p>
       <div className="mt-3 flex flex-wrap gap-2">
-        {tags.map((t) => (
-          <span
-            key={t}
-            className={`rounded-full px-2.5 py-1 text-xs ${
-              isAI
-                ? 'bg-fuchsia-500/15 text-fuchsia-200 border border-fuchsia-300/20'
-                : 'bg-zinc-800 text-zinc-200 border border-zinc-700'
-            }`}
-          >
-            {t}
-          </span>
+        {labels.map((l) => (
+          <Tag key={l}>{l}</Tag>
         ))}
       </div>
-    </a>
+      <h3 className="mt-3 text-white font-semibold">{title}</h3>
+      <p className={`mt-1 text-sm ${isAI ? 'text-zinc-200' : 'text-zinc-300'}`}>{summary}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {stack.map((s) => (
+          <span key={s} className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-zinc-300">{s}</span>
+        ))}
+      </div>
+      <div className="mt-3 flex gap-2">
+        <a href={link} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm ${
+          isAI ? 'bg-gradient-to-r from-[#7b61ff] to-[#00f5d4] text-black' : 'bg-white text-black'
+        }`}>
+          <ExternalLink className="h-4 w-4" /> Visit
+        </a>
+        <a href={link} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm border ${
+          isAI ? 'border-white/15 bg-white/5 text-white' : 'border-zinc-700 bg-zinc-900 text-white'
+        }`}>
+          Details
+        </a>
+      </div>
+    </div>
   );
 }
 
 function AIAssistant({ mood }) {
   const isAI = mood === 'ai';
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hi! I\'m the on-page AI. Ask about my projects or tech stack.' },
+    { role: 'assistant', content: "Ask My Work: Try 'Show Rahul’s AI projects', 'Summarize Eagle i', or 'What skills match a Data Engineering role?'" },
   ]);
   const [input, setInput] = useState('');
-  const inputRef = useRef(null);
 
-  const handleSend = () => {
-    const text = input.trim();
-    if (!text) return;
-    setMessages((m) => [...m, { role: 'user', content: text }]);
+  const canned = (q) => {
+    const t = q.toLowerCase();
+    if (t.includes('ai project')) return 'AI Projects: Eagle i, TechTrek — AI Resume Generator. Both leverage LLMs and intelligent detection.';
+    if (t.includes('summarize') && t.includes('eagle')) return 'Eagle i targets fraud websites and enhances security via intelligent detection. Stack: Generative AI, Python, Web.';
+    if (t.includes('data') && t.includes('engineer')) return 'Matching skills: Python, SQL, Data Engineering (AWS, Celonis), Business Analytics.';
+    return 'I can filter projects, summarize highlights, and map skills. More smart features coming soon.';
+  };
+
+  const send = () => {
+    const q = input.trim();
+    if (!q) return;
+    setMessages((m) => [...m, { role: 'user', content: q }]);
     setInput('');
-    // Canned reply for speed and to avoid network calls
-    const reply =
-      text.toLowerCase().includes('stack')
-        ? 'React, Vite, Tailwind, Framer Motion on the front; FastAPI + MongoDB on the back. Optimized for performance.'
-        : text.toLowerCase().includes('project')
-        ? 'I build immersive, fast sites with 3D accents and AI helpers. Check the cards for details.'
-        : 'Great question! I\'ll keep refining this assistant with voice and smarter answers next.';
-    setTimeout(() => setMessages((m) => [...m, { role: 'assistant', content: reply }]), 300);
-    inputRef.current?.focus();
+    setTimeout(() => setMessages((m) => [...m, { role: 'assistant', content: canned(q) }]), 250);
   };
 
   return (
-    <div
-      className={`rounded-2xl border p-4 sm:p-5 ${
-        isAI ? 'border-white/10 bg-white/5' : 'border-zinc-800 bg-zinc-900/70'
-      }`}
-    >
-      <div className="flex items-center gap-2 text-sm font-medium text-zinc-200">
-        <MessageCircle size={16} /> Quick AI Assistant
+    <div className={`rounded-2xl border p-4 ${isAI ? 'border-white/10 bg-white/5' : 'border-zinc-800 bg-zinc-900/70'}`}>
+      <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
+        <MessageCircle className="h-4 w-4" /> Ask My Work
       </div>
-      <div className="mt-3 space-y-2 max-h-56 overflow-y-auto pr-1">
+      <div className="mt-3 max-h-56 overflow-y-auto space-y-2 pr-1">
         {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`w-fit max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-              m.role === 'assistant'
-                ? isAI
-                  ? 'bg-fuchsia-500/15 text-fuchsia-100'
-                  : 'bg-zinc-800 text-zinc-200'
-                : 'bg-zinc-200 text-zinc-900 ml-auto'
-            }`}
-          >
-            {m.content}
-          </div>
+          <div key={i} className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${m.role === 'assistant' ? 'bg-white/10 text-zinc-100' : 'ml-auto bg-zinc-200 text-zinc-900'}`}>{m.content}</div>
         ))}
       </div>
       <div className="mt-3 flex gap-2">
-        <input
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Ask something..."
-          className={`flex-1 rounded-lg px-3 py-2 text-sm outline-none transition ${
-            isAI ? 'bg-white/10 text-white placeholder:text-zinc-300' : 'bg-zinc-800 text-white placeholder:text-zinc-400'
-          }`}
-        />
-        <button
-          onClick={handleSend}
-          className={`rounded-lg px-3 py-2 text-sm font-semibold ${
-            isAI ? 'bg-gradient-to-r from-fuchsia-500 to-cyan-400 text-black' : 'bg-white text-black'
-          }`}
-        >
-          Send
-        </button>
+        <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e)=> e.key==='Enter' && send()} placeholder="Type a question…" className={`flex-1 rounded-lg px-3 py-2 text-sm outline-none ${isAI ? 'bg-white/10 text-white placeholder:text-zinc-300' : 'bg-zinc-800 text-white placeholder:text-zinc-400'}`} />
+        <button onClick={send} className={`rounded-lg px-3 py-2 text-sm font-semibold ${isAI ? 'bg-gradient-to-r from-[#7b61ff] to-[#00f5d4] text-black' : 'bg-white text-black'}`}>Send</button>
       </div>
     </div>
   );
 }
 
 export default function Work({ mood }) {
-  const projects = useMemo(
-    () => [
-      {
-        title: 'Neon Portfolio',
-        description: '3D hero, AI chat helper, and blazing-fast UI with optimized rendering.',
-        tags: ['React', 'Spline', 'AI UI'],
-        href: 'https://example.com',
-      },
-      {
-        title: 'Realtime Dashboard',
-        description: 'Clean, accessible charts and controls with dark mode and animations.',
-        tags: ['Vite', 'Tailwind', 'Framer Motion'],
-        href: 'https://example.com',
-      },
-      {
-        title: 'GenAI Toolkit',
-        description: 'Embeddings, retrieval, and prompt tooling with FastAPI + MongoDB.',
-        tags: ['FastAPI', 'MongoDB', 'RAG'],
-        href: 'https://example.com',
-      },
-    ],
-    []
-  );
+  const filters = ['All', 'Web Apps', 'AI Projects', 'Mobile', 'Analytics'];
+  const [active, setActive] = useState('All');
+
+  const items = useMemo(() => ([
+    { key: 'eagle', title: 'Eagle i (AI • Security)', summary: 'Targets fraud websites; enhances security via intelligent detection.', stack: ['Generative AI', 'Python', 'Web'], labels: ['AI'], cat: 'AI Projects', link: 'https://example.com' },
+    { key: 'onthego', title: 'OnTheGo (Mobile • Service)', summary: 'Vehicle breakdown recovery companion app.', stack: ['Android', 'Firebase', 'Maps'], labels: ['Mobile'], cat: 'Mobile', link: 'https://example.com' },
+    { key: 'food', title: 'Food Donation App (Android • Social)', summary: 'Donor ↔ charity matching with maps & auth.', stack: ['Android', 'Firebase', 'Auth'], labels: ['Mobile'], cat: 'Mobile', link: 'https://example.com' },
+    { key: 'techtrek', title: 'TechTrek — AI Resume Generator (Web • AI)', summary: 'Tailors resumes using LLMs.', stack: ['LLMs', 'Next.js', 'Vercel'], labels: ['Web', 'AI'], cat: 'AI Projects', link: 'https://example.com' },
+    { key: 'tamasha', title: 'TAMASHA @ Houseway.co.in (Web • Events)', summary: 'Interactive event engagement site.', stack: ['React', 'Animation', 'Design'], labels: ['Web'], cat: 'Web Apps', link: 'https://example.com' },
+  ]), []);
+
+  const visible = items.filter((i) => active === 'All' ? true : i.cat === active);
 
   return (
     <section id="work" className="relative mx-auto mt-16 w-full max-w-6xl px-6">
-      <div className="flex items-end justify-between">
-        <h2 className="text-xl sm:text-2xl font-semibold text-white">Selected Work</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl sm:text-2xl font-semibold text-white">Featured Projects</h2>
+        <div className="flex items-center gap-2 text-xs">
+          <Filter className="h-4 w-4 text-zinc-400" />
+          <div className="flex gap-1">
+            {filters.map((f) => (
+              <button key={f} onClick={() => setActive(f)} className={`rounded-full px-3 py-1 border text-xs ${active===f ? 'bg-gradient-to-r from-[#7b61ff] to-[#00f5d4] text-black border-transparent' : 'border-white/10 text-zinc-200'}`}>{f}</button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {projects.map((p) => (
-          <ProjectCard key={p.title} mood={mood} {...p} />
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {visible.map((p) => (
+          <ProjectCard key={p.key} mood={mood} title={p.title} summary={p.summary} stack={p.stack} labels={p.labels} link={p.link} />
         ))}
       </div>
 
-      <div className="mt-6">
+      <div className="mt-8">
         <AIAssistant mood={mood} />
       </div>
     </section>
