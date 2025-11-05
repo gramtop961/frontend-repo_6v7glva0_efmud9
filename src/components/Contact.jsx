@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Mail, Download } from 'lucide-react';
 
-export default function Contact() {
+export default function Contact({ mood = 'professional' }) {
   const [sent, setSent] = useState(false);
 
   const onSubmit = (e) => {
@@ -22,8 +22,10 @@ export default function Contact() {
     URL.revokeObjectURL(url);
   };
 
+  const cardBg = mood === 'ai' ? 'bg-white/10' : 'bg-white/5';
+
   return (
-    <section id="contact" className="relative w-full bg-[#0a0a0f] py-20 text-white">
+    <section id="contact" className="relative w-full py-20 text-white">
       <div className="mx-auto max-w-6xl px-6">
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
@@ -35,7 +37,7 @@ export default function Contact() {
         </motion.h2>
 
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+          <div className={`rounded-2xl border border-white/10 ${cardBg} p-6 backdrop-blur`}>
             <p className="text-sm text-cyan-100/80">
               Reach out for collaborations, consulting, or full-stack projects.
             </p>
@@ -63,7 +65,7 @@ export default function Contact() {
             </form>
           </div>
           <div className="space-y-6">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+            <div className={`rounded-2xl border border-white/10 ${cardBg} p-6 backdrop-blur`}>
               <p className="text-sm font-semibold text-cyan-100/80">Connect</p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <a href="https://www.linkedin.com" target="_blank" className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm text-cyan-100 hover:bg-white/20">
@@ -80,7 +82,7 @@ export default function Contact() {
                 </button>
               </div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+            <div className={`rounded-2xl border border-white/10 ${cardBg} p-6 backdrop-blur`}>
               <p className="text-sm font-semibold text-cyan-100/80">Testimonials</p>
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {["Recognized for leading teams and creating engaging student events.", "Rahul blends strategy, design, and engineering into outcomes."]

@@ -17,11 +17,14 @@ const TimelineItem = ({ year, title, subtitle }) => (
   </motion.div>
 );
 
-export default function About() {
+export default function About({ mood = 'professional' }) {
+  const cardBase = 'rounded-2xl border border-white/10 p-4 backdrop-blur';
+  const cardBg = mood === 'ai' ? 'bg-white/10' : 'bg-white/5';
+
   return (
-    <section id="about" className="relative w-full bg-[#0a0a0f] py-20 text-white">
+    <section id="about" className="relative w-full py-20 text-white">
       <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="absolute -top-10 left-1/3 h-64 w-64 rounded-full bg-[#00f5d4]/10 blur-2xl" />
+        <div className={`absolute -top-10 left-1/3 h-64 w-64 rounded-full ${mood === 'ai' ? 'bg-[#00f5d4]/20' : 'bg-[#00f5d4]/10'} blur-2xl`} />
       </div>
 
       <div className="mx-auto max-w-6xl px-6">
@@ -49,7 +52,7 @@ export default function About() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"
+            className={`${cardBase} ${cardBg}`}
           >
             <div className="flex items-center gap-2 text-cyan-200">
               <MapPin className="h-4 w-4" />
@@ -60,7 +63,7 @@ export default function About() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"
+            className={`${cardBase} ${cardBg}`}
           >
             <div className="flex items-center gap-2 text-violet-200">
               <GraduationCap className="h-4 w-4" />
@@ -71,7 +74,7 @@ export default function About() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"
+            className={`${cardBase} ${cardBg}`}
           >
             <div className="flex items-center gap-2 text-cyan-200">
               <Brain className="h-4 w-4" />
@@ -81,7 +84,7 @@ export default function About() {
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+          <div className={`${cardBase} ${cardBg} p-6`}>
             <p className="text-sm font-semibold tracking-wide text-cyan-100/80">Milestones</p>
             <div className="mt-4 space-y-4">
               <TimelineItem year="2025" title="Web Developer @ SkillSavvy" subtitle="Built delightful web experiences and component systems." />
@@ -92,7 +95,7 @@ export default function About() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+          <div className={`${cardBase} ${cardBg} p-6`}>
             <p className="text-sm font-semibold tracking-wide text-cyan-100/80">Education & Certifications</p>
             <div className="mt-4 space-y-4">
               <TimelineItem year="B.Tech" title="Computer Science & Business Systems" subtitle="R.V.R. & J.C. College of Engineering – CGPA: 7.53/10" />
@@ -104,15 +107,15 @@ export default function About() {
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+          <div className={`${cardBase} ${cardBg} p-5`}>
             <p className="text-xs uppercase tracking-widest text-cyan-200/70">Leadership</p>
             <p className="mt-2 text-sm text-white">Event Organizer @ RVRJCCE</p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+          <div className={`${cardBase} ${cardBg} p-5`}>
             <p className="text-xs uppercase tracking-widest text-cyan-200/70">Community</p>
             <p className="mt-2 text-sm text-white">Student Activity Council – Co-Lead</p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+          <div className={`${cardBase} ${cardBg} p-5`}>
             <p className="text-xs uppercase tracking-widest text-cyan-200/70">Recognition</p>
             <p className="mt-2 text-sm text-white">Leading teams & creating engaging student events</p>
           </div>

@@ -52,13 +52,13 @@ const skills = {
   'Soft Skills': ['Leadership', 'Adaptability', 'Client Relations', 'Design Thinking']
 };
 
-function ProjectCard({ p }) {
+function ProjectCard({ p, mood }) {
   return (
     <motion.div
       whileHover={{ y: -6 }}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur"
+      className={`group relative overflow-hidden rounded-2xl border border-white/10 ${mood === 'ai' ? 'bg-white/10' : 'bg-white/5'} p-5 backdrop-blur`}
     >
-      <div className={`absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br ${p.color} opacity-20 blur-2xl`} />
+      <div className={`absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br ${p.color} ${mood === 'ai' ? 'opacity-30' : 'opacity-20'} blur-2xl`} />
       <div className="flex items-center justify-between">
         <span className="rounded-full border border-white/10 bg-white/10 px-2 py-1 text-[10px] font-semibold tracking-widest text-cyan-100/80">
           {p.label}
@@ -83,10 +83,9 @@ function ProjectCard({ p }) {
   );
 }
 
-function RadarLike() {
-  // Simple animated grid representing a radar-like visual
+function RadarLike({ mood }) {
   return (
-    <div className="relative h-64 w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0d0d14]">
+    <div className={`relative h-64 w-full overflow-hidden rounded-2xl border border-white/10 ${mood === 'ai' ? 'bg-[#0c0c16]' : 'bg-[#0d0d14]'}`}>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(123,97,255,.15)_0,transparent_60%)]" />
       <motion.div
         animate={{ rotate: 360 }}
@@ -107,7 +106,7 @@ function RadarLike() {
   );
 }
 
-function AIAssistant() {
+function AIAssistant({ mood }) {
   const [messages, setMessages] = useState([
     { role: 'ai', content: "Hi! I’m Rahul’s AI assistant. Ask me about his projects or resume ✨" }
   ]);
@@ -137,11 +136,11 @@ function AIAssistant() {
   };
 
   const gradient = useMemo(() => (
-    'bg-gradient-to-br from-[#0f172a]/70 to-[#1e1b4b]/60'
-  ), []);
+    mood === 'ai' ? 'bg-gradient-to-br from-[#0b1020]/80 to-[#1b1240]/60' : 'bg-gradient-to-br from-[#0f172a]/70 to-[#1e1b4b]/60'
+  ), [mood]);
 
   return (
-    <div className={`rounded-2xl border border-white/10 ${gradient} p-4 backdrop-blur`}> 
+    <div className={`rounded-2xl border border-white/10 ${gradient} p-4 backdrop-blur`}>
       <div className="mb-3 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-[#00f5d4]" />
         <p className="text-sm font-semibold text-white">AI Assistant</p>
@@ -171,9 +170,9 @@ function AIAssistant() {
   );
 }
 
-export default function Work() {
+export default function Work({ mood = 'professional' }) {
   return (
-    <section id="work" className="relative w-full bg-[#0a0a0f] py-20 text-white">
+    <section id="work" className="relative w-full py-20 text-white">
       <div className="mx-auto max-w-6xl px-6">
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
@@ -186,12 +185,12 @@ export default function Work() {
 
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((p) => (
-            <ProjectCard key={p.title} p={p} />
+            <ProjectCard key={p.title} p={p} mood={mood} />
           ))}
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur lg:col-span-2">
+          <div className={`rounded-2xl border border-white/10 ${mood === 'ai' ? 'bg-white/10' : 'bg-white/5'} p-6 backdrop-blur lg:col-span-2`}>
             <p className="text-sm font-semibold tracking-wide text-cyan-100/80">Skills & Expertise</p>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {Object.entries(skills).map(([k, v]) => (
@@ -219,8 +218,8 @@ export default function Work() {
             </div>
           </div>
           <div className="space-y-6">
-            <RadarLike />
-            <AIAssistant />
+            <RadarLike mood={mood} />
+            <AIAssistant mood={mood} />
           </div>
         </div>
       </div>
