@@ -1,23 +1,43 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useEffect, useMemo } from 'react';
 import Spline from '@splinetool/react-spline';
-import { Rocket, Handshake } from 'lucide-react';
+import { Rocket, Cpu } from 'lucide-react';
 
-const GlowLayer = ({ mood }) => (
-  <div className="pointer-events-none absolute inset-0" aria-hidden>
-    <div className={`absolute -top-28 left-8 h-80 w-80 rounded-full ${mood === 'ai' ? 'bg-[#00f5d4]/25' : 'bg-[#00f5d4]/15'} blur-3xl`} />
-    <div className={`absolute top-24 right-10 h-96 w-96 rounded-full ${mood === 'ai' ? 'bg-[#7b61ff]/25' : 'bg-[#7b61ff]/15'} blur-3xl`} />
-    <div className={`absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full ${mood === 'ai' ? 'bg-cyan-300/20' : 'bg-cyan-300/10'} blur-3xl`} />
-  </div>
-);
+const MoodBadge = ({ mood }) => {
+  const isAI = mood === 'ai';
+  return (
+    <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium shadow-sm border ${
+      isAI
+        ? 'bg-fuchsia-500/15 border-fuchsia-300/30 text-fuchsia-200'
+        : 'bg-zinc-800/60 border-zinc-700 text-zinc-200'
+    }`}
+    >
+      {isAI ? <Cpu size={14} /> : <Rocket size={14} />}
+      {isAI ? 'AI Mode' : 'Professional'}
+    </div>
+  );
+};
 
-export default function Hero({ onViewWork, onHireMe, mood = 'professional' }) {
-  const titleGradient = mood === 'ai'
-    ? 'from-[#00f5d4] via-[#b4f5ff] to-[#7b61ff]'
-    : 'from-[#00f5d4] via-white to-[#7b61ff]';
+export default function Hero({ mood, onScrollToWork }) {
+  const containerRef = useRef(null);
+
+  // Precompute gradient styles based on mood to avoid recalculation per render
+  const gradients = useMemo(() => {
+    if (mood === 'ai') {
+      return 'from-fuchsia-500/30 via-cyan-400/20 to-purple-500/30';
+    }
+    return 'from-zinc-700/30 via-zinc-600/20 to-zinc-700/30';
+  }, [mood]);
+
+  useEffect(() => {
+    // Prevent scroll jank on mobile by hinting the browser
+    if (containerRef.current) {
+      containerRef.current.style.contain = 'content';
+    }
+  }, []);
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden text-white">
+    <section ref={containerRef} className="relative h-[90vh] w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
+      {/* 3D Scene */}
       <div className="absolute inset-0">
         <Spline
           scene="https://prod.spline.design/EF7JOSsHLk16Tlw9/scene.splinecode"
@@ -25,66 +45,42 @@ export default function Hero({ onViewWork, onHireMe, mood = 'professional' }) {
         />
       </div>
 
-      {/* Soft glow overlays */}
-      <GlowLayer mood={mood} />
+      {/* Non-blocking overlays for glow/gradients */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className={`absolute -inset-32 blur-3xl opacity-60 bg-gradient-to-tr ${gradients}`} />
+      </div>
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-6 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className={`bg-gradient-to-r ${titleGradient} bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-7xl`}
-        >
-          RAHUL GUNDA
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.7 }}
-          className="mt-4 text-xl text-cyan-100/90 sm:text-2xl"
-        >
-          Smart Design. Human Touch.
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.7 }}
-          className="mt-4 max-w-2xl text-base text-cyan-100/70 sm:text-lg"
-        >
-          Tech-driven strategist & full-stack developer specializing in Generative AI, Web Development, and Business Analytics.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.7 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
-        >
+      {/* Content */}
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-6 text-center">
+        <MoodBadge mood={mood} />
+        <h1 className="mt-5 bg-gradient-to-br from-white via-white to-zinc-300 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl md:text-6xl">
+          Rahul Gunda
+        </h1>
+        <p className={`mt-4 max-w-2xl text-sm sm:text-base ${mood === 'ai' ? 'text-zinc-300' : 'text-zinc-400'}`}>
+          Building intelligent, immersive web experiences with modern frontend and AI-first design.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <button
-            onClick={onViewWork}
-            className={`group inline-flex items-center gap-2 rounded-full border ${mood === 'ai' ? 'border-[#00f5d4]/50' : 'border-[#00f5d4]/30'} bg-white/5 px-6 py-3 text-sm font-semibold text-cyan-100 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/10 ${mood === 'ai' ? 'hover:shadow-[0_0_35px_#00f5d488]' : 'hover:shadow-[0_0_30px_#00f5d477]'}`}
+            onClick={onScrollToWork}
+            className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              mood === 'ai'
+                ? 'bg-gradient-to-r from-fuchsia-500 to-cyan-400 text-black focus:ring-fuchsia-400 focus:ring-offset-black'
+                : 'bg-white text-black hover:bg-zinc-200 focus:ring-zinc-400 focus:ring-offset-black'
+            }`}
           >
-            <Rocket className="h-4 w-4 text-[#00f5d4] transition group-hover:rotate-12" />
-            <span>View My Work</span>
+            <Rocket size={16} /> Explore Work
           </button>
-          <button
-            onClick={onHireMe}
-            className={`group inline-flex items-center gap-2 rounded-full border ${mood === 'ai' ? 'border-[#7b61ff]/60' : 'border-[#7b61ff]/40'} bg-white/5 px-6 py-3 text-sm font-semibold text-violet-100 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/10 ${mood === 'ai' ? 'hover:shadow-[0_0_35px_#7b61ffff]' : 'hover:shadow-[0_0_30px_#7b61ffff]'}`}
+          <a
+            href="#contact"
+            className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors ${
+              mood === 'ai'
+                ? 'bg-zinc-900/70 text-zinc-200 border border-white/10 hover:bg-zinc-900'
+                : 'bg-zinc-900 text-zinc-100 border border-zinc-700 hover:bg-zinc-800'
+            }`}
           >
-            <Handshake className="h-4 w-4 text-[#7b61ff] transition group-hover:scale-110" />
-            <span>Hire Me</span>
-          </button>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.85 }}
-          transition={{ delay: 1.0, duration: 1.2 }}
-          className="pointer-events-none absolute bottom-10 right-6 hidden select-none rounded-3xl border border-white/10 bg-white/5 p-3 backdrop-blur md:block"
-        >
-          <div className={`h-20 w-16 rounded-xl ${mood === 'ai' ? 'bg-gradient-to-b from-[#00f5d4]/40 to-[#7b61ff]/40' : 'bg-gradient-to-b from-[#00f5d4]/30 to-[#7b61ff]/30'}`} />
-          <p className="mt-2 text-[10px] uppercase tracking-widest text-cyan-100/70">AI Hologram</p>
-        </motion.div>
+            Contact
+          </a>
+        </div>
       </div>
     </section>
   );
